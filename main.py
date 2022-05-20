@@ -12,7 +12,9 @@ def fill_color(val):
     return 'color: green' if val==1 else 'color: red'
 
 def show_bar(data, header, x, x_title):
-    with st.container():
+    plot_spot = st.empty()
+    with plot_spot:
+    # with st.container():
         st.header(header)
         st.vega_lite_chart(data, {
             'mark': "bar",
@@ -27,7 +29,9 @@ def show_bar(data, header, x, x_title):
         })
 
 def show_plot(data, header, x, x_title, y, y_title):
-    with st.container():
+    plot_spot = st.empty()
+    with plot_spot:
+    # with st.container():
         st.header(header)
         st.vega_lite_chart(data, {
             'mark': {'type': 'circle', 'tooltip': True, "size": 175},
@@ -55,7 +59,9 @@ if __name__ == '__main__':
     specialities_choice = st.sidebar.selectbox("Спеціальність:", spec_faculties[spec_faculties.isin([faculties_choice])].index)
     price_choice = st.sidebar.slider('Ціна:', min_value=0.0, max_value=df['кінцева ціна'].max(), step=500.0, value=10000.0)
     external_evaluation_choice = st.sidebar.slider('Бал ЗНО:', min_value=100.0, max_value=200.0, step=.5, value=150.0)
-    is_budget = st.sidebar.checkbox(label="Бюджет")
+    form_of_study = st.sidebar.radio(
+        "Акцент на:",
+        ('Бюджет', 'Контракт'))
     graduation_choice = st.sidebar.slider('Бал атестату:', min_value=0.0, max_value=12.0, step=.5, value=10.0)
     military_choise = st.sidebar.checkbox(label = "Воєнна кафедра")
     hostel_choise = st.sidebar.checkbox(label="Гуртожиток")
@@ -65,10 +71,10 @@ if __name__ == '__main__':
     df = df[df['місто'].isin(cities_choice)]
     df = df[df[specialities_choice] == 1]
     df = df[ ((price_choice >= df['начальна ціна']) & (price_choice <= df['кінцева ціна'])) | (price_choice > df['кінцева ціна']) ]
-    if is_budget:
+    if form_of_study == 'Бюджет':
         df = df[(external_evaluation_choice >= df[f"{specialities_choice}_бюджет"]) & (df[f"{specialities_choice}_бюджет"] != -1)]
         df = df[graduation_choice >= df[f'Середній бал атестата зарахованих на бюджет']]
-    else:
+    elif form_of_study == 'Контракт':
         df = df[external_evaluation_choice >= df[f"{specialities_choice}_контракт"]]
         df = df[graduation_choice >= df[f'Середній бал атестата зарахованих на контракт']]
     if military_choise:
@@ -167,7 +173,13 @@ if __name__ == '__main__':
                   y='Конкурс на одне бюджетне місце (всі заяви)',
                   y_title='Конкурс на одне бюджетне місце')
 
+        show_plot(header="Всього зараховано на бюджет & Всього зараховано на контракт", data=df,
+                  x=f"Зараховано на бюджет всього",
+                  x_title=f"Зараховано на бюджет всього",
+                  y='Зараховано на контракт всього',
+                  y_title='Зараховано на контракт всього')
 
+        print(type(df['ціна'].iloc[0]))
         ukr_names = df['ukr_name']
         refs = df['сайт']
         for i, ukr_name in enumerate(ukr_names):
