@@ -9,7 +9,7 @@ def read_faculties():
         return data
 
 def fill_color(val):
-    return 'color: green' if val==1 else 'color: red'
+    return 'color: green' if val=='так' else 'color: red'
 
 def show_bar(data, header, x, x_title):
     plot_spot = st.empty()
@@ -54,15 +54,15 @@ if __name__ == '__main__':
     cities = df['місто'].unique()
     military_dep = df['воєнна кафедра'].unique()
 
-    cities_choice = st.sidebar.multiselect("Місто:", cities, default=['Дніпро'])
-    faculties_choice = st.sidebar.selectbox("Галузь:", faculties)
+    cities_choice = st.sidebar.multiselect("Місто:", cities, default=['Дніпро', 'Київ', 'Львів', 'Харків'])
+    faculties_choice = st.sidebar.selectbox("Галузь:", faculties, index=20)
     specialities_choice = st.sidebar.selectbox("Спеціальність:", spec_faculties[spec_faculties.isin([faculties_choice])].index)
-    price_choice = st.sidebar.slider('Ціна:', min_value=0.0, max_value=df['кінцева ціна'].max(), step=500.0, value=10000.0)
-    external_evaluation_choice = st.sidebar.slider('Бал ЗНО:', min_value=100.0, max_value=200.0, step=.5, value=150.0)
+    price_choice = st.sidebar.slider('Ціна:', min_value=0.0, max_value=90000.0, step=500.0, value=20000.0)
+    external_evaluation_choice = st.sidebar.slider('Бал ЗНО:', min_value=100.0, max_value=200.0, step=.5, value=177.0)
     form_of_study = st.sidebar.radio(
         "Акцент на:",
         ('Бюджет', 'Контракт'))
-    graduation_choice = st.sidebar.slider('Бал атестату:', min_value=0.0, max_value=12.0, step=.5, value=10.0)
+    graduation_choice = st.sidebar.slider('Бал атестату:', min_value=0.0, max_value=12.0, step=.5, value=10.5)
     military_choise = st.sidebar.checkbox(label = "Воєнна кафедра")
     hostel_choise = st.sidebar.checkbox(label="Гуртожиток")
     preparatory_choise = st.sidebar.checkbox(label="Підготовчі курси")
@@ -88,6 +88,8 @@ if __name__ == '__main__':
 
     if (len(df) > 0):
         df_heatmap = df[['ukr_name', 'місто', 'воєнна кафедра', 'гуртожиток', 'підготовчі курси', 'Міжнародний обмін']]
+        df_heatmap.replace(1, 'так', inplace=True)
+        df_heatmap.fillna('ні', inplace=True)
         df_heatmap = df_heatmap.style.applymap(fill_color, subset=['гуртожиток', 'воєнна кафедра', 'підготовчі курси', 'Міжнародний обмін'])
         st.table(df_heatmap)
 
@@ -179,7 +181,6 @@ if __name__ == '__main__':
                   y='Зараховано на контракт всього',
                   y_title='Зараховано на контракт всього')
 
-        print(type(df['ціна'].iloc[0]))
         ukr_names = df['ukr_name']
         refs = df['сайт']
         for i, ukr_name in enumerate(ukr_names):
