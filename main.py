@@ -89,6 +89,7 @@ if __name__ == '__main__':
     if (len(df) > 0):
         df_heatmap = df[['ukr_name', 'місто', 'воєнна кафедра', 'гуртожиток', 'підготовчі курси', 'Міжнародний обмін']]
         df_heatmap.replace(1, 'так', inplace=True)
+        df_heatmap.replace(0, 'ні', inplace=True)
         df_heatmap.fillna('ні', inplace=True)
         df_heatmap = df_heatmap.style.applymap(fill_color, subset=['гуртожиток', 'воєнна кафедра', 'підготовчі курси', 'Міжнародний обмін'])
         st.table(df_heatmap)
